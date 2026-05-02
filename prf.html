@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio — Développeur Full Stack & Bases de Données</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #006D77;
+            --secondary: #83C5BE;
+            --accent: #E29578;
+            --dark: #1A1A2E;
+            --light: #EDF6F9;
+            --code: #00B4D8;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        /* Custom Cursor */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+        }
+        
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        
+        .cursor-outline.hover {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 109, 119, 0.1);
+            border-color: var(--accent);
+        }
+        
+        /* Data Flow Background */
+        .data-flow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0.1;
+        }
+        
+        .data-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: flow 3s linear infinite;
+        }
+        
+        @keyframes flow {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* Terminal Effect */
+        .terminal {
+            background: var(--dark);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal::before {
+            content: '● ● ●';
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            color: #ff5f56;
+            font-size: 12px;
+            letter-spacing: 6px;
+        }
+        
+        .terminal-content {
+            padding: 40px 20px 20px;
+            color: #00ff00;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Profile Photo Styles */
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .profile-photo {
+            width: 280px;
+            height: 280px;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 20px 50px rgba(0,109,119,0.3);
+            transition: all 0.5s ease;
+            animation: morph 8s ease-in-out infinite;
+        }
+        
+        .profile-photo:hover {
+            border-radius: 50%;
+            transform: scale(1.05);
+        }
+        
+        @keyframes morph {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+            50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+            75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+        }
+        
+        .profile-badge {
+            position: absolute;
+            bottom: 20px;
+            right: -10px;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(226,149,120,0.4);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .photo-placeholder {
+            width: 280px;
+            height: 280px;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 4px dashed white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: morph 8s ease-in-out infinite;
+        }
+        
+        .photo-placeholder:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: scale(1.02);
+        }
+        
+        /* Language Tags */
+        .lang-tag {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .lang-tag:hover {
+            transform: translateY(-2px) rotate(2deg);
+            box-shadow: 0 10px 20px rgba(0,109,119,0.3);
+        }
+        
+        /* Skill Bars */
+        .skill-bar {
+            background: rgba(0,109,119,0.1);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--code));
+            border-radius: 999px;
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Database Schema Visual */
+        .db-table {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .db-table:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,109,119,0.2);
+        }
+        
+        .db-header {
+            background: var(--primary);
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .db-row {
+            padding: 6px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        
+        .db-row:last-child {
+            border-bottom: none;
+        }
+        
+        /* Timeline */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border: 4px solid white;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 4px var(--primary);
+        }
+        
+        /* Mobile cursor disable */
+        @media (pointer: coarse) {
+            .cursor-dot, .cursor-outline { display: none; }
+            body { cursor: auto; }
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-line { left: 20px; }
+            .timeline-dot { left: 20px; }
+            .profile-photo, .photo-placeholder {
+                width: 220px;
+                height: 220px;
+            }
+        }
+        
+        /* Profile Description Card */
+        .profile-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(0,109,119,0.05), rgba(131,197,190,0.1));
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-teal-600 selection:text-white">
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-teal-100 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="font-mono text-xl font-bold text-teal-800 magnetic-element" data-cursor="hover">
+                &lt;TS_DB_DEV/&gt;
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-semibold">
+                <a href="#profil" class="hover:text-teal-600 transition-colors magnetic-element" data-cursor="hover">PROFIL</a>
+                <a href="#experience" class="hover:text-teal-600 transition-colors magnetic-element" data-cursor="hover">EXPÉRIENCE</a>
+                <a href="#competences" class="hover:text-teal-600 transition-colors magnetic-element" data-cursor="hover">COMPÉTENCES</a>
+                <a href="#langues" class="hover:text-teal-600 transition-colors magnetic-element" data-cursor="hover">LANGUES</a>
+                <a href="#contact" class="px-4 py-2 bg-teal-700 text-white rounded-full hover:bg-teal-800 transition-colors magnetic-element" data-cursor="hover">CONTACT</a>
+            </div>
+            <button class="md:hidden text-2xl text-teal-800" onclick="toggleMenu()">☰</button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-teal-900 z-40 transform translate-x-full transition-transform duration-500 flex flex-col justify-center items-center gap-8 text-white text-2xl font-bold">
+        <a href="#profil" onclick="toggleMenu()">PROFIL</a>
+        <a href="#experience" onclick="toggleMenu()">EXPÉRIENCE</a>
+        <a href="#competences" onclick="toggleMenu()">COMPÉTENCES</a>
+        <a href="#langues" onclick="toggleMenu()">LANGUES</a>
+        <a href="#contact" onclick="toggleMenu()">CONTACT</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center relative overflow-hidden pt-20 px-6">
+        <div class="data-flow">
+            <div class="data-line" style="top: 20%; width: 60%; animation-delay: 0s;"></div>
+            <div class="data-line" style="top: 40%; width: 40%; animation-delay: 0.5s;"></div>
+            <div class="data-line" style="top: 60%; width: 80%; animation-delay: 1s;"></div>
+            <div class="data-line" style="top: 80%; width: 50%; animation-delay: 1.5s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div>
+                <div class="inline-block px-4 py-2 bg-teal-100 text-teal-800 rounded-full text-sm font-mono mb-6">
+                    Disponible pour opportunités
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Développeur<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500">Full Stack</span><br>
+                    & Bases de Données
+                </h1>
+                <p class="text-xl text-gray-600 mb-8 max-w-lg">
+                    Diplômé TS en informatique (spécialité BD). Passionné par l'architecture client-serveur et le développement d'applications robustes.
+                </p>
+                
+                <div class="flex flex-wrap gap-4">
+                    <a href="#profil" class="magnetic-element px-8 py-4 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition-all hover:scale-105 shadow-lg shadow-teal-700/30" data-cursor="hover">
+                        Voir mon profil
+                    </a>
+                    <a href="#contact" class="magnetic-element px-8 py-4 border-2 border-teal-700 text-teal-700 rounded-full font-semibold hover:bg-teal-50 transition-all" data-cursor="hover">
+                        Me contacter
+                    </a>
+                </div>
+            </div>
+
+            <div class="relative flex justify-center">
+                <!-- ZONE PHOTO DE PROFIL - Remplacez le placeholder par votre photo -->
+                <div class="profile-container magnetic-element" data-cursor="hover">
+                 
+                    
+                  
+                        
+                        <img src="photo.jpg" alt="MAROUF" class="profile-photo">
+                    
+                    
+                    <div class="profile-badge">TS INFO BD</div>
+                </div>
+                
+                <!-- Floating Elements -->
+                <div class="absolute -top-10 -right-10 w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-full opacity-20 blur-xl animate-pulse"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-orange-400 to-pink-400 rounded-full opacity-20 blur-xl animate-pulse" style="animation-delay: 1s;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION PROFIL DÉTAILLÉE AVEC PHOTO ET DESCRIPTION -->
+    <section id="profil" class="py-24 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-teal-900 mb-4">Profil Professionnel</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-teal-600 to-cyan-500 mx-auto rounded-full"></div>
+            </div>
+
+            <div class="profile-card p-8 md:p-12">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- COLONNE GAUCHE : Photo et infos rapides -->
+                    <div class="lg:col-span-4 flex flex-col items-center">
+                        <!-- DEUXIÈME EMPLACEMENT PHOTO (version carte) -->
+                        <div class="relative mb-6 group">
+                            <div class="absolute -inset-1 bg-gradient-to-r from-teal-600 to-cyan-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                            
+                            <!-- 
+                                Placeholder pour la photo dans la carte de profil
+                                Remplacez par : <img src="votre-photo.jpg" class="relative rounded-2xl w-64 h-64 object-cover shadow-xl">
+                            -->
+                            <div class="relative rounded-2xl w-64 h-64 bg-gradient-to-br from-teal-100 to-cyan-100 flex flex-col items-center justify-center border-2 border-dashed border-teal-300 cursor-pointer hover:border-teal-500 transition-colors" onclick="document.getElementById('file-input-2').click()">
+                               
+                                <img src="photo.jpg" class="relative rounded-2xl w-64 h-64 object-cover shadow-xl">
+                              
+                               
+                            </div>
+                        </div>
+
+                        <!-- Stats rapides -->
+                        <div class="grid grid-cols-3 gap-3 w-full max-w-xs">
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-teal-700">4</div>
+                                <div class="text-xs text-gray-600 mt-1">Langues</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-teal-700">6</div>
+                                <div class="text-xs text-gray-600 mt-1">Mois Stage</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="text-2xl font-bold text-teal-700">TS</div>
+                                <div class="text-xs text-gray-600 mt-1">Niveau</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLONNE DROITE : Description détaillée -->
+                    <div class="lg:col-span-8">
+                        <div class="mb-6">
+                            <h3 class="text-3xl font-bold text-gray-900 mb-2">[belkacem]</h3>
+                            <p class="text-lg text-teal-600 font-medium">Développeur Applications & Bases de Données</p>
+                        </div>
+
+                        <!-- Description modifiable -->
+                        <div class="prose prose-lg text-gray-700 space-y-4 mb-8">
+                            <p class="leading-relaxed">
+                                <!-- MODIFIEZ CE TEXTE AVEC VOTRE DESCRIPTION -->
+                                Diplômé d'un <strong class="text-teal-700">Technicien Supérieur en Informatique</strong> (spécialité Bases de Données), 
+                                je suis passionné par le développement d'applications robustes et l'optimisation des systèmes de gestion de données. 
+                                Mon parcours atypique, enrichi par ma <strong class="text-teal-700">maîtrise de quatre langues</strong> (Kabyle maternelle, 
+                                Français, Arabe et Anglais), me permet d'évoluer efficacement dans des environnements multiculturels.
+                            </p>
+                            
+                            <p class="leading-relaxed">
+                                J'ai consolidé mes compétences techniques lors d'un <strong class="text-teal-700">stage de six mois à l'ENIEM</strong> 
+                                (Entreprise Nationale des Industries Électriques et Ménagères), où j'ai conçu et développé une 
+                                <strong class="text-teal-700">application client-serveur complète</strong>. Cette expérience m'a permis de maîtriser 
+                                l'ensemble du cycle de développement, de l'analyse des besoins à la mise en production.
+                            </p>
+
+                            <p class="leading-relaxed">
+                                Rigoureux et autonome, je recherche activement une opportunité pour mettre mon expertise en 
+                                <strong class="text-teal-700">Python, SQL et architecture client-serveur</strong> au service de projets innovants.
+                            </p>
+                        </div>
+
+                        <!-- Points clés -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <div class="flex items-start gap-3 p-4 bg-teal-50 rounded-xl">
+                                <div class="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-700 flex-shrink-0">
+                                    🎓
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Formation</div>
+                                    <div class="text-sm text-gray-600">TS Informatique - Option Bases de Données</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-3 p-4 bg-cyan-50 rounded-xl">
+                                <div class="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center text-cyan-700 flex-shrink-0">
+                                    💼
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Expérience</div>
+                                    <div class="text-sm text-gray-600">Stage 6 mois ENIEM - App Client/Serveur</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3 p-4 bg-orange-50 rounded-xl">
+                                <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700 flex-shrink-0">
+                                    🌍
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Atout</div>
+                                    <div class="text-sm text-gray-600">4 langues (Kabyle, FR, AR, EN)</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3 p-4 bg-purple-50 rounded-xl">
+                                <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 flex-shrink-0">
+                                    🎯
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900">Objectif</div>
+                                    <div class="text-sm text-gray-600">Développeur Full Stack / DBA Junior</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTA -->
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#contact" class="magnetic-element inline-flex items-center gap-2 px-6 py-3 bg-teal-700 text-white rounded-full font-semibold hover:bg-teal-800 transition-all" data-cursor="hover">
+                                <span>Me contacter</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                            </a>
+                            <button onclick="window.print()" class="magnetic-element inline-flex items-center gap-2 px-6 py-3 border-2 border-teal-700 text-teal-700 rounded-full font-semibold hover:bg-teal-50 transition-all" data-cursor="hover">
+                                <span>Télécharger CV</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Timeline -->
+    <section id="experience" class="py-24 px-6 bg-gray-50 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto relative">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-teal-900">Parcours Professionnel</h2>
+            
+            <div class="relative">
+                <div class="timeline-line"></div>
+                
+                <!-- Stage ENIEM -->
+                <div class="relative mb-16 md:mb-24">
+                    <div class="timeline-dot" style="top: 20px;"></div>
+                    <div class="md:w-1/2 md:ml-auto md:pl-12 ml-12">
+                        <div class="bg-white p-6 rounded-2xl shadow-lg border-l-4 border-teal-600 hover:shadow-xl transition-shadow">
+                            <div class="text-sm font-mono text-teal-600 mb-2">2023-2024 • 6 mois</div>
+                            <h3 class="text-2xl font-bold mb-2">Stage Développeur</h3>
+                            <div class="text-lg text-gray-600 mb-4 font-semibold">ENIEM</div>
+                            <p class="text-gray-600 mb-4">
+                                Développement d'une application client-serveur pour la gestion interne. Conception de la base de données, développement backend et frontend.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-mono">Client/Serveur</span>
+                                <span class="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-mono">Base de données</span>
+                                <span class="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-mono">Python</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formation -->
+                <div class="relative">
+                    <div class="timeline-dot" style="top: 20px; background: var(--secondary);"></div>
+                    <div class="md:w-1/2 md:mr-auto md:pr-12 md:text-right ml-12">
+                        <div class="bg-white p-6 rounded-2xl shadow-lg border-r-4 border-cyan-600 hover:shadow-xl transition-shadow">
+                            <div class="text-sm font-mono text-cyan-600 mb-2">2021-2023</div>
+                            <h3 class="text-2xl font-bold mb-2">TS Informatique</h3>
+                            <div class="text-lg text-gray-600 mb-4 font-semibold">Spécialité Bases de Données</div>
+                            <p class="text-gray-600 mb-4">
+                                Formation approfondie en conception de bases de données, SQL, programmation et développement d'applications.
+                            </p>
+                            <div class="flex flex-wrap gap-2 md:justify-end">
+                                <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm font-mono">SQL</span>
+                                <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm font-mono">Merise</span>
+                                <span class="px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm font-mono">UML</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </section>
+
+    <!-- Skills Section -->
+    <section id="competences" class="py-24 px-6 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 text-teal-900">Compétences Techniques</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                        <span class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center text-teal-700">💻</span>
+                        Programmation
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>Python</span>
+                                <span class="text-teal-600">90%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="90%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>SQL & Bases de Données</span>
+                                <span class="text-teal-600">95%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="95%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>Architecture Client/Serveur</span>
+                                <span class="text-teal-600">85%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                        <span class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center text-cyan-700">🌐</span>
+                        Développement Web
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>HTML / CSS / JavaScript</span>
+                                <span class="text-cyan-600">88%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="88%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>Frameworks Web</span>
+                                <span class="text-cyan-600">80%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="80%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2 font-semibold">
+                                <span>Conception de Bases de Données</span>
+                                <span class="text-cyan-600">92%</span>
+                            </div>
+                            <div class="skill-bar h-3">
+                                <div class="skill-progress" data-width="92%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-teal-50 transition-colors group">
+                    <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🐍</div>
+                    <div class="font-semibold text-gray-700">Python</div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-teal-50 transition-colors group">
+                    <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🗄️</div>
+                    <div class="font-semibold text-gray-700">MySQL/PostgreSQL</div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-teal-50 transition-colors group">
+                    <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">⚡</div>
+                    <div class="font-semibold text-gray-700">API REST</div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-xl text-center hover:bg-teal-50 transition-colors group">
+                    <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">🔧</div>
+                    <div class="font-semibold text-gray-700">Git/GitHub</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Languages Section -->
+    <section id="langues" class="py-24 px-6 bg-gradient-to-br from-teal-900 to-cyan-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 text-9xl font-bold">أ</div>
+            <div class="absolute bottom-10 right-10 text-9xl font-bold">ⴰ</div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl font-bold opacity-5">A</div>
+        </div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">Polyglotte</h2>
+            <p class="text-center text-teal-200 mb-16 text-lg">Quatre langues pour communiquer sans frontières</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Kabyle -->
+                <div class="lang-tag p-6 rounded-2xl magnetic-element" data-cursor="hover">
+                    <div class="text-4xl mb-4">ⵣ</div>
+                    <h3 class="text-xl font-bold mb-2">Kabyle</h3>
+                    <div class="text-sm opacity-90 mb-4">Taqbaylit</div>
+                    <div class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">Langue Maternelle</div>
+                    <div class="mt-4 text-sm opacity-80">Courant (oral & écrit)</div>
+                </div>
+
+                <!-- French -->
+                <div class="lang-tag p-6 rounded-2xl magnetic-element" data-cursor="hover">
+                    <div class="text-4xl mb-4">🇫🇷</div>
+                    <h3 class="text-xl font-bold mb-2">Français</h3>
+                    <div class="text-sm opacity-90 mb-4">Langue de formation</div>
+                    <div class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">Courant</div>
+                    <div class="mt-4 text-sm opacity-80">Technique & professionnel</div>
+                </div>
+
+                <!-- Arabic -->
+                <div class="lang-tag p-6 rounded-2xl magnetic-element" data-cursor="hover">
+                    <div class="text-4xl mb-4">🇸🇦</div>
+                    <h3 class="text-xl font-bold mb-2">Arabe</h3>
+                    <div class="text-sm opacity-90 mb-4">العربية</div>
+                    <div class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">Courant</div>
+                    <div class="mt-4 text-sm opacity-80">Lu, écrit & parlé</div>
+                </div>
+
+                <!-- English -->
+                <div class="lang-tag p-6 rounded-2xl magnetic-element" data-cursor="hover">
+                    <div class="text-4xl mb-4">🇬🇧</div>
+                    <h3 class="text-xl font-bold mb-2">Anglais</h3>
+                    <div class="text-sm opacity-90 mb-4">English</div>
+                    <div class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-semibold">Technique</div>
+                    <div class="mt-4 text-sm opacity-80">Documentation & communication</div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-teal-200 max-w-2xl mx-auto">
+                    Cette diversité linguistique me permet de collaborer efficacement dans des environnements multiculturels et d'accéder à des ressources techniques dans plusieurs langues.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 px-6 bg-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 text-teal-900">Travaillons Ensemble</h2>
+            <p class="text-xl text-gray-600 mb-12">À la recherche d'opportunités en développement et bases de données</p>
+            
+            <div class="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 md:p-12 shadow-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <a href="mailto:contact@email.com" class="group flex items-center justify-center gap-4 p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all magnetic-element" data-cursor="hover">
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 group-hover:scale-110 transition-transform">✉️</div>
+                        <div class="text-left">
+                            <div class="text-sm text-gray-500">Email</div>
+                            <div class="font-semibold text-teal-900">bekamarouf36@email.com</div>
+                        </div>
+                    </a>
+                    
+                    <a href="tel:+21300000000" class="group flex items-center justify-center gap-4 p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all magnetic-element" data-cursor="hover">
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 group-hover:scale-110 transition-transform">📱</div>
+                        <div class="text-left">
+                            <div class="text-sm text-gray-500">Téléphone</div>
+                            <div class="font-semibold text-teal-900">0795628270</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="flex justify-center gap-4">
+                    <a href="#" class="magnetic-element w-12 h-12 bg-teal-700 text-white rounded-full flex items-center justify-center hover:bg-teal-800 transition-colors" data-cursor="hover">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="#" class="magnetic-element w-12 h-12 bg-teal-700 text-white rounded-full flex items-center justify-center hover:bg-teal-800 transition-colors" data-cursor="hover">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-teal-950 text-teal-200 py-8 px-6 text-center">
+        <p class="font-mono text-sm">© 2024 - Développé avec passion | TS Informatique BD</p>
+    </footer>
+
+    <script>
+        // Register GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Custom Cursor
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const magneticElements = document.querySelectorAll('.magnetic-element');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        magneticElements.forEach(elem => {
+            elem.addEventListener('mousemove', (e) => {
+                const rect = elem.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                elem.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+                
+                if (elem.dataset.cursor === 'hover') {
+                    cursorOutline.classList.add('hover');
+                }
+            });
+
+            elem.addEventListener('mouseleave', () => {
+                elem.style.transform = 'translate(0, 0)';
+                cursorOutline.classList.remove('hover');
+            });
+        });
+
+        // Skill Bars Animation
+        const skillBars = document.querySelectorAll('.skill-progress');
+        
+        skillBars.forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            
+            ScrollTrigger.create({
+                trigger: bar,
+                start: "top 85%",
+                onEnter: () => {
+                    bar.style.width = width;
+                }
+            });
+        });
+
+        // Mobile Menu
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('translate-x-full');
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Profile Card Animation
+        gsap.from('.profile-card', {
+            scrollTrigger: {
+                trigger: '.profile-card',
+                start: "top 80%"
+            },
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out"
+        });
+
+        // Reveal Animations
+        gsap.utils.toArray('.lang-tag').forEach((tag, i) => {
+            gsap.from(tag, {
+                scrollTrigger: {
+                    trigger: tag,
+                    start: "top 85%"
+                },
+                y: 30,
+                opacity: 0,
+                rotation: -5,
+                duration: 0.6,
+                delay: i * 0.1,
+                ease: "back.out(1.7)"
+            });
+        });
+    </script>
+</body>
+</html>
